@@ -24,12 +24,8 @@ class Source:
 	"""
 	A raw vocal sound
 	"""
-	def __init__(self, fundamental,
-				harmonics=np.array([1, 2, 3]),
-				amplitudes=np.array([1., 0., 0.])):
-		assert len(harmonics) == len(amplitudes)
+	def __init__(self, fundamental,	amplitudes=np.array([1., 0., 0.])):
 		self.fundamental = fundamental
-		self.harmonics = harmonics
 		self.amplitudes = amplitudes
 
 	def make_wave_file(self, filename='output.wav',
@@ -39,10 +35,10 @@ class Source:
 		"""
 		t = np.linspace(0., 2., int(bitrate*seconds) + 1)
 		data = np.zeros(t.shape)
-		for i in xrange(0, len(self.harmonics)):
-			f = self.harmonics[i]*self.fundamental
+		for i in xrange(0, len(self.amplitudes)):
+			f = (i+1)*self.fundamental
 			data += self.amplitudes[i]*np.sin(2.*np.pi*f*t)
-		scaled = np.int16(data*32767)
+		scaled = np.int16(data/np.max(np.abs(data))*32767)
 		write(filename, bitrate, scaled)
 		return scaled
 
