@@ -3,24 +3,29 @@ from Sound import *
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Make a middle C
+fundamental = 110.*2.**(3./12)
 harmonics = np.arange(1, 50)
-amplitudes = np.exp(-(harmonics-2)**2/2.**2)
+amplitudes = np.exp(-(harmonics-2)**2/20.**2)
 
 # Supposedly the I vowel (en.wikipedia.org/wiki/Formant)
-EH = Formant([240., 2400.], [1., 1.], [500., 500.])
+formant = Formant([240., 2400.], [1., 1.], [100., 100.])
 
-# Make a middle C
-s = Sound(220.*2.**(3./12), amplitudes)
+# Make the sound
+s = Sound(fundamental, amplitudes)
 
-plt.plot(harmonics, s.amplitudes, 'bo-', label='Input Source')
+plt.plot(fundamental*harmonics, s.amplitudes, 'bo-', label='Input Source')
 plt.xlabel('Harmonic')
 plt.ylabel('Amplitude')
 
-# Apply the EH
-s.apply_formant(EH)
+f = fundamental*np.linspace(1., harmonics.max(), 10001)
+plt.plot(f, formant.evaluate(f), 'r', label='Formant')
+
+# Apply the formant
+s.apply_formant(formant)
 s.make_wave_file()
 
-plt.plot(harmonics, s.amplitudes, 'ro-', label='With Formant')
+plt.plot(fundamental*harmonics, s.amplitudes, 'go-', label='With Formant')
 plt.legend()
 plt.show()
 
